@@ -1,11 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <cmath>
-#include <cstdlib>
-#include <ctime>
-#include <assert.h>
 #include "neuralnetwork.h"
-using namespace std;
 
 double Neuron::eta = 0.15;
 double Neuron::alpha = 0.5;
@@ -123,7 +116,36 @@ void Net::backprop(const vector<double> &target_vals) {
     }
 }
 
+vector<unsigned> Net::get_topology() {
+    return top;
+}
+
+void Net::save_to_file(const char * filename) {
+     
+    ofstream ofs(filename, std::ofstream::out);
+    for (unsigned i=0;i<top.size();i++) {
+        ofs << top[i] << " ";
+    }
+    ofs << endl;
+    for (unsigned layer_num = 0; layer_num < layers.size(); layer_num++) {
+        for (unsigned neuron_num = 0; neuron_num < layers[layer_num]; neuron_num++) {
+            Neuron curr_neuron = layers[layer_num][neuron_num];
+            for (unsigned weight_num = 0; weight_num < curr_neuron.output_weights.size()-1;weight_num++) {
+                Connection curr_weight = curr_neuron.output_weights[weight_num];
+                ofs << curr_weight.weight << " " << curr_weight.delta_weight << ", ";
+            }
+
+            Connection last_weight = curr_neuron.output_weights.back();
+            ofs << last_weight.weight << " " << last_weight.delta_weight << endl;
+        }          
+    } 
+
+    ofs.close();
+}
+
 Net::Net(const vector<unsigned> &topology) {
+    vector<unsigned> x(topology);
+    top = x;
     unsigned num_layers = topology.size();
     for (unsigned i = 0; i<num_layers; ++i) {
         layers.push_back(Layer());
@@ -137,32 +159,3 @@ Net::Net(const vector<unsigned> &topology) {
     }
 }
 
-
-
-/*
-int main() {
-    srand(time(0));
-
-    vector<unsigned> topology;
-    vector< vector<double> > training_data; 
-    vector< vector<double> > target_vals;
-    assert(training_data.size() == target_vals.size());
-    Net my_net(topology);
-    for (unsigned i=0;i<training_data.size();++i) {
-        my_net.feed_forward(training_data[i]);      my_net.backprop(target_vals[i]); }
-    vector< vector<double> > test_data;
-    vector< vector<double> > test_target_vals;
-    vector< vector<double> > test_results;
-    for (unsigned i=0;i<test_data.size();++i) {
-        my_net.feed_forward(training_data[i]);
-        my_net.get_results(test_results[i]);
-    }
-    for (unsigned i=0;i<test_results.size();++i) {
-        cout << "TEST DATA RESULT FOR CASE " << i << ":" << endl;
-        for (unsigned j=0;j<test_results[i].size();++j) {
-           cout << test_results[i][j] << " "; 
-        }
-        cout << endl;
-    }
-}
-*/

@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <assert.h>
+#include <fstream>
 using namespace std;
 
 #ifndef NEURAL_NETWORK_H
@@ -47,10 +48,12 @@ class Net {
         void feed_forward(const vector<double> &input_vals);
         void backprop(const vector<double> &target_vals);
         void get_results(vector<double> &result_vals) const;
-       
+        vector<unsigned> get_topology(); 
+        void save_to_file(const char * filename);
     private:
         std::vector<Layer> layers; 
         double error;
         double recent_average_error;
+        vector<unsigned> top;
 };
 #endif

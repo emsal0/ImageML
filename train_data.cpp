@@ -21,7 +21,7 @@ int main(int argc, char ** argv) {
     vector <unsigned> simplified = simplify(image); 
     unsigned r=0;
     for (vector<unsigned>::iterator it = simplified.begin();it!=simplified.end();++it) {
-        cout << *it << " ";
+        cout << *it;
         r++;
         if (r==32) {
             cout << endl;

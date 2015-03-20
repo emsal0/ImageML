@@ -21,11 +21,10 @@ vector<unsigned> simplify(cv::Mat image) {
             double green = avg_color[1];
             double red = avg_color[2];
 
+            //int c = (255 - blue > blue) || (255 - green > green) || (255 - red > red);
             double h_avg = (blue + green + red) / 3;
-
             ret.push_back(255 - h_avg > h_avg);
         }
     }
-
     return ret;
 } 
