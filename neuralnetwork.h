@@ -4,6 +4,8 @@
 #include <cstdlib>
 #include <ctime>
 #include <assert.h>
+#include <string>
+#include <sstream>
 #include <fstream>
 using namespace std;
 
@@ -27,6 +29,7 @@ class Neuron {
         void calc_output_gradients(double target_val);
         void calc_hidden_gradients(const Layer &next_layer);
         void update_input_weights(Layer &prev_layer);
+        vector<Connection> output_weights;
 
     private:
         static double eta;
@@ -36,7 +39,6 @@ class Neuron {
         static double random_weight() {return rand() / double (RAND_MAX); }
         double sum_DOW(const Layer &next_layer) const;
         double output_val;
-        vector<Connection> output_weights;
         unsigned index;
         double gradient;
 };
@@ -45,6 +47,7 @@ class Neuron {
 class Net {
     public:
         Net(const vector<unsigned> &topology);
+        Net(const char * filename);
         void feed_forward(const vector<double> &input_vals);
         void backprop(const vector<double> &target_vals);
         void get_results(vector<double> &result_vals) const;

@@ -121,20 +121,20 @@ vector<unsigned> Net::get_topology() {
 }
 
 void Net::save_to_file(const char * filename) {
-     
     ofstream ofs(filename, std::ofstream::out);
+    ofs << top.size() << endl;     
     for (unsigned i=0;i<top.size();i++) {
         ofs << top[i] << " ";
     }
     ofs << endl;
-    for (unsigned layer_num = 0; layer_num < layers.size(); layer_num++) {
-        for (unsigned neuron_num = 0; neuron_num < layers[layer_num]; neuron_num++) {
+    for (unsigned layer_num = 0; layer_num < layers.size()-1; layer_num++) {
+        for (unsigned neuron_num = 0; neuron_num < layers[layer_num].size(); neuron_num++) {
             Neuron curr_neuron = layers[layer_num][neuron_num];
             for (unsigned weight_num = 0; weight_num < curr_neuron.output_weights.size()-1;weight_num++) {
-                Connection curr_weight = curr_neuron.output_weights[weight_num];
-                ofs << curr_weight.weight << " " << curr_weight.delta_weight << ", ";
+                cout << layer_num << " " <<  neuron_num << " " << weight_num << endl;
+                Connection curr_weight = curr_neuron.output_weights.at(weight_num);
+                ofs << curr_weight.weight << " " << curr_weight.delta_weight << ",";
             }
-
             Connection last_weight = curr_neuron.output_weights.back();
             ofs << last_weight.weight << " " << last_weight.delta_weight << endl;
         }          
@@ -159,3 +159,52 @@ Net::Net(const vector<unsigned> &topology) {
     }
 }
 
+Net::Net(const char * filename) {
+    ifstream ifs(filename,std::ifstream::in);
+    string line;
+    getline(ifs,line);
+    istringstream ss(line);
+    unsigned top_size;
+    ss >> top_size;
+    getline(ifs,line);
+    stringstream top_stream(line);
+    for (unsigned i=0;i<top_size;i++) {
+        string item;
+        while (getline(top_stream,item,' ')) {
+            stringstream item_stream(item);
+            unsigned layer_size;        
+            item_stream >> layer_size;
+            top.push_back(layer_size); 
+        }
+    }
+    for (unsigned layer_num=0;layer_num < top.size();layer_num++) {
+        layers.push_back(Layer());
+        unsigned num_outputs = layer_num == top.size()-1 ? 0 : top[layer_num+1];
+        for (unsigned neuron_num = 0;neuron_num <= top[layer_num]; ++neuron_num) {
+            layers.back().push_back(Neuron(num_outputs,neuron_num));
+            string neuron_line;
+            getline(ifs,neuron_line);    
+            stringstream neuron_stream(neuron_line);
+            string output_weight_string;
+            vector<Connection> o_weights;
+            while (getline(neuron_stream,output_weight_string,',')) {
+                stringstream output_weight_stream(output_weight_string);
+                string weight_string;
+                string delta_weight_string;
+                double weight;
+                double delta_weight;
+                getline(output_weight_stream,weight_string,' ');
+                stringstream weight_stream(weight_string);
+                weight_stream >> weight;
+                getline(output_weight_stream,delta_weight_string,' ');
+                stringstream delta_weight_stream(delta_weight_string);
+                delta_weight_stream >> delta_weight;
+                Connection output_weight = { .weight = weight, .delta_weight = delta_weight };
+                o_weights.push_back(output_weight);
+            }
+            layers.back().back().output_weights = o_weights;  
+        }
+        layers.back().back().set_output_value(1.0);
+    }
+    ifs.close();
+}
