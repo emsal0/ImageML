@@ -23,7 +23,7 @@ int main(int argc, char ** argv) {
     for (vector<unsigned>::iterator it = simplified.begin();it!=simplified.end();++it) {
         cout << *it;
         r++;
-        if (r==32) {
+        if (r==16) {
             cout << endl;
             r=0;
         }

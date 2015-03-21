@@ -28,8 +28,7 @@ double Neuron::transfer_function(double x) {
 }
 
 double Neuron::transfer_function_derivative(double x) {
-    double z = Neuron::transfer_function(x);
-    return z * (1-z);
+    return x * (1-x);
 }
 
 void Neuron::feed_forward(const Layer &prev_layer) {
@@ -131,7 +130,6 @@ void Net::save_to_file(const char * filename) {
         for (unsigned neuron_num = 0; neuron_num < layers[layer_num].size(); neuron_num++) {
             Neuron curr_neuron = layers[layer_num][neuron_num];
             for (unsigned weight_num = 0; weight_num < curr_neuron.output_weights.size()-1;weight_num++) {
-                cout << layer_num << " " <<  neuron_num << " " << weight_num << endl;
                 Connection curr_weight = curr_neuron.output_weights.at(weight_num);
                 ofs << curr_weight.weight << " " << curr_weight.delta_weight << ",";
             }
@@ -193,12 +191,15 @@ Net::Net(const char * filename) {
                 string delta_weight_string;
                 double weight;
                 double delta_weight;
+
                 getline(output_weight_stream,weight_string,' ');
                 stringstream weight_stream(weight_string);
                 weight_stream >> weight;
+
                 getline(output_weight_stream,delta_weight_string,' ');
                 stringstream delta_weight_stream(delta_weight_string);
                 delta_weight_stream >> delta_weight;
+
                 Connection output_weight = { .weight = weight, .delta_weight = delta_weight };
                 o_weights.push_back(output_weight);
             }
