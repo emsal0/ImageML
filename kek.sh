@@ -1,0 +1,10 @@
+./train_data /home/em/Downloads/Eng-Characters/Img/GoodImg/Bmp/Sample001/ 0
+./train_data /home/em/Downloads/Eng-Characters/Img/GoodImg/Bmp/Sample002/ 1
+./train_data /home/em/Downloads/Eng-Characters/Img/GoodImg/Bmp/Sample003/ 2
+./train_data /home/em/Downloads/Eng-Characters/Img/GoodImg/Bmp/Sample004/ 3
+./train_data /home/em/Downloads/Eng-Characters/Img/GoodImg/Bmp/Sample005/ 4
+./train_data /home/em/Downloads/Eng-Characters/Img/GoodImg/Bmp/Sample006/ 5
+./train_data /home/em/Downloads/Eng-Characters/Img/GoodImg/Bmp/Sample007/ 6
+./train_data /home/em/Downloads/Eng-Characters/Img/GoodImg/Bmp/Sample008/ 7
+./train_data /home/em/Downloads/Eng-Characters/Img/GoodImg/Bmp/Sample009/ 8
+./train_data /home/em/Downloads/Eng-Characters/Img/GoodImg/Bmp/Sample010/ 9

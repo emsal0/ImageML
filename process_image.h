@@ -4,4 +4,4 @@
 #include <vector>
 using namespace std;
 
-vector<unsigned> simplify(cv::Mat image);
+vector<double> simplify(cv::Mat image);

@@ -1,13 +1,15 @@
 #include "process_image.h"
 
-vector<unsigned> simplify(cv::Mat image) {
-    vector<unsigned> ret;
+vector<double> simplify(cv::Mat image) {
+    vector<double> ret;
 
     int height = image.rows;
     int width = image.cols;
 
     int small_height = height / 16;
     int small_width = width / 16;
+    //small_height = small_height?small_height:1;
+    //small_width = small_width?small_width:1;
    
     cv::Scalar big_avg_color = cv::mean(image);
 

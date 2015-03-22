@@ -4,6 +4,9 @@
 #include <cstdlib>
 #include <ctime>
 #include <assert.h>
+#include <dirent.h>
+#include <errno.h>
+#include <string>
 #include "opencv2/core/core.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -11,32 +14,65 @@
 #include "process_image.h"
 
 using namespace std;
+int getdir (string dir, vector<string> &files)
+{
+    DIR *dp;
+    struct dirent *dirp;
+    if((dp  = opendir(dir.c_str())) == NULL) {
+        cout << "Error(" << errno << ") opening " << dir << endl;
+        return errno;
+    }
+
+    while ((dirp = readdir(dp)) != NULL) {
+        files.push_back(string(dirp->d_name));
+    }
+    closedir(dp);
+    return 0;
+}
 
 int main(int argc, char ** argv) {
     srand(time(0));
-
-    cv::Mat image;
-    image = cv::imread(argv[1],CV_LOAD_IMAGE_COLOR);
-    
-    vector <unsigned> simplified = simplify(image); 
-    unsigned r=0;
-    for (vector<unsigned>::iterator it = simplified.begin();it!=simplified.end();++it) {
-        cout << *it;
-        r++;
-        if (r==16) {
-            cout << endl;
-            r=0;
-        }
+    vector<string> files;
+    string dir(argv[1]); 
+    getdir(dir,files);
+    int target = atoi(argv[2]);
+    vector<double> target_v(10,0);
+    target_v[target] = 1;
+ 
+    for (unsigned i=0;i<target_v.size();i++) {
+        cout << target_v[i] << " ";
     }
     cout << endl;
 
-    vector<unsigned> topology;
-    topology.push_back(3);
-    topology.push_back(2);
-    topology.push_back(1);
-    Net my_net(topology);
-    my_net.save_to_file("asdf.txt");
-    Net my_net2("asdf.txt");
-    my_net2.save_to_file("asdf2.txt");
+    Net * my_net;
+    if (!ifstream("test.txt")) {
+        vector<unsigned> topology;
+        topology.push_back(16*16);
+        topology.push_back(16*16);
+        topology.push_back(16*16);
+        topology.push_back(10);
+        my_net = new Net(topology);   
+    } else {
+        my_net = new Net("test.txt");
+    }
+
+    for (unsigned i=0;i<files.size();i++) {
+        string f = string(argv[1]);
+        f.append(files[i]);
+        cout << f << endl;
+        cv::Mat image = cv::imread(f.c_str(), CV_LOAD_IMAGE_COLOR);    
+        cout << image.rows << " " << image.cols << endl;
+        if (image.rows < 16 || image.cols < 16) {
+            cout << "too small!" << endl;
+            continue;
+        }
+        vector<double> simplified = simplify(image);
+        my_net->feed_forward(simplified);
+        my_net->backprop(target_v);
+    }
+    my_net->save_to_file("test.txt");
+
+    delete my_net;
+
     return(0);
 }

@@ -7,28 +7,32 @@ Neuron::Neuron (unsigned num_outputs, unsigned my_index) {
     for (unsigned c=0;c<num_outputs;++c) {
         output_weights.push_back(Connection());
         output_weights.back().weight = random_weight();
-        output_weights.back().delta_weight = 0.0;
+        //output_weights.back().delta_weight = 0.0;
     }
     index = my_index;
 }
 
 void Neuron::update_input_weights(Layer &prev_layer) {
+//    cout << "a" << endl;
     for (unsigned n=0;n<prev_layer.size();++n) {
         Neuron &neuron = prev_layer[n];
+        //double old_weight = neuron.output_weights[index].weight;
         double old_delta_weight = neuron.output_weights[index].delta_weight;
 
         double new_delta_weight = eta * neuron.get_output_value() * gradient + alpha * old_delta_weight;
+        //cout << new_delta_weight << endl;
         neuron.output_weights[index].delta_weight = new_delta_weight;
-        neuron.output_weights[index].weight -= new_delta_weight;
+        neuron.output_weights[index].weight += new_delta_weight;
+//        cout << "weight updated from " << old_weight << " to " << neuron.output_weights[index].weight << endl;
     } 
 }
 
 double Neuron::transfer_function(double x) {
-    return (1.0 / (1.0 + exp(-x)));
+    return tanh(x);
 }
 
 double Neuron::transfer_function_derivative(double x) {
-    return x * (1-x);
+    return 1.0 - x * x;
 }
 
 void Neuron::feed_forward(const Layer &prev_layer) {
@@ -70,7 +74,7 @@ void Net::get_results(vector<double> &result_vals) const {
 }
 
 void Net::feed_forward(const vector<double> &input_vals) {
-    assert(input_vals.size() == layers[0].size());
+    //assert(input_vals.size() == layers[0].size()-1);
     for (unsigned i=0; i<input_vals.size();++i) {
         layers[0][i].set_output_value(input_vals[i]);
     }
@@ -84,9 +88,9 @@ void Net::feed_forward(const vector<double> &input_vals) {
 
 void Net::backprop(const vector<double> &target_vals) {
     Layer &output_layer = layers.back(); 
-    assert(target_vals.size() == output_layer.size());
+    cout << "outputs: " << output_layer.size() << ", targets: " << target_vals.size() << endl;
     error = 0.0;
-    for (unsigned n=0; n<output_layer.size() - 1;++n) {
+    for (unsigned n=0; n<output_layer.size()-1;++n) {
         double delta = target_vals[n] - output_layer[n].get_output_value();
         error += delta*delta;
     }
@@ -97,7 +101,7 @@ void Net::backprop(const vector<double> &target_vals) {
         output_layer[n].calc_output_gradients(target_vals[n]);
     }
 
-    for (unsigned layer_num = layers.size() -2; layer_num > 0; --layer_num) {
+    for (unsigned layer_num = layers.size()-2; layer_num > 0; layer_num--) {
         Layer &hidden_layer = layers[layer_num];
         Layer &next_layer = layers[layer_num+1];
 
@@ -106,10 +110,11 @@ void Net::backprop(const vector<double> &target_vals) {
         }
     }
 
-    for (unsigned layer_num = layers.size() - 1; layer_num > 0; --layer_num) {
+    for (unsigned layer_num = layers.size() - 1; layer_num > 0; layer_num--) {
         Layer &layer = layers[layer_num];
-        Layer &prev_layer = layers[layer_num -1];
+        Layer &prev_layer = layers[layer_num-1];
         for (unsigned n=0;n<layer.size();++n) {
+            //cout << n << endl;
             layer[n].update_input_weights(prev_layer);
         }
     }
@@ -130,7 +135,7 @@ void Net::save_to_file(const char * filename) {
         for (unsigned neuron_num = 0; neuron_num < layers[layer_num].size(); neuron_num++) {
             Neuron curr_neuron = layers[layer_num][neuron_num];
             for (unsigned weight_num = 0; weight_num < curr_neuron.output_weights.size()-1;weight_num++) {
-                Connection curr_weight = curr_neuron.output_weights.at(weight_num);
+                Connection curr_weight = curr_neuron.output_weights[weight_num];
                 ofs << curr_weight.weight << " " << curr_weight.delta_weight << ",";
             }
             Connection last_weight = curr_neuron.output_weights.back();
@@ -189,18 +194,18 @@ Net::Net(const char * filename) {
                 stringstream output_weight_stream(output_weight_string);
                 string weight_string;
                 string delta_weight_string;
-                double weight;
-                double delta_weight;
+                double c_weight;
+                double c_delta_weight;
 
                 getline(output_weight_stream,weight_string,' ');
                 stringstream weight_stream(weight_string);
-                weight_stream >> weight;
+                weight_stream >> c_weight;
 
                 getline(output_weight_stream,delta_weight_string,' ');
                 stringstream delta_weight_stream(delta_weight_string);
-                delta_weight_stream >> delta_weight;
+                delta_weight_stream >> c_delta_weight;
 
-                Connection output_weight = { .weight = weight, .delta_weight = delta_weight };
+                Connection output_weight = { .weight = c_weight, .delta_weight = c_delta_weight };
                 o_weights.push_back(output_weight);
             }
             layers.back().back().output_weights = o_weights;  
