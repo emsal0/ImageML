@@ -125,7 +125,7 @@ vector<unsigned> Net::get_topology() {
 }
 
 void Net::save_to_file(const char * filename) {
-    ofstream ofs(filename, std::ofstream::out);
+    fstream ofs(filename, std::ofstream::out);
     ofs << top.size() << endl;     
     for (unsigned i=0;i<top.size();i++) {
         ofs << top[i] << " ";
