@@ -74,7 +74,7 @@ void Net::get_results(vector<double> &result_vals) const {
 }
 
 void Net::feed_forward(const vector<double> &input_vals) {
-    //assert(input_vals.size() == layers[0].size()-1);
+    assert(input_vals.size() == layers[0].size()-1);
     for (unsigned i=0; i<input_vals.size();++i) {
         layers[0][i].set_output_value(input_vals[i]);
     }

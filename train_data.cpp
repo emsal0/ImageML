@@ -55,12 +55,13 @@ int main(int argc, char ** argv) {
     } else {
         my_net = new Net("test.txt");
     }
+    cout << "files: " << files.size() << endl;
 
     for (unsigned i=0;i<files.size();i++) {
-        string f = string(argv[1]);
-        f.append(files[i]);
-        cout << f << endl;
-        cv::Mat image = cv::imread(f.c_str(), CV_LOAD_IMAGE_COLOR);    
+        string cf = dir+files[i];
+        cv::Mat image;
+        cout << cf << endl;
+        image = cv::imread(cf, CV_LOAD_IMAGE_COLOR);    
         cout << image.rows << " " << image.cols << endl;
         if (image.rows < 16 || image.cols < 16) {
             cout << "too small!" << endl;
