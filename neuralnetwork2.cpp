@@ -14,13 +14,12 @@ Neuron::Neuron (unsigned num_outputs, unsigned my_index) {
 
 void Neuron::update_input_weights(Layer &prev_layer) {
 //    cout << "a" << endl;
-    for (unsigned n=0;n<prev_layer.size();++n) {
-        Neuron &neuron = prev_layer[n];
+    for (Layer::iterator it = prev_layer.begin();it!=prev_layer.end();++it) {
+        Neuron &neuron = *it;
         //double old_weight = neuron.output_weights[index].weight;
-        double old_delta_weight = neuron.output_weights[index].delta_weight;
+        double old_delta_weight = neuron.output_weights.at(index).delta_weight;
 
         double new_delta_weight = eta * neuron.get_output_value() * gradient + alpha * old_delta_weight;
-        //cout << new_delta_weight << endl;
         neuron.output_weights[index].delta_weight = new_delta_weight;
         neuron.output_weights[index].weight += new_delta_weight;
 //        cout << "weight updated from " << old_weight << " to " << neuron.output_weights[index].weight << endl;
@@ -113,7 +112,7 @@ void Net::backprop(const vector<double> &target_vals) {
     for (unsigned layer_num = layers.size() - 1; layer_num > 0; layer_num--) {
         Layer &layer = layers[layer_num];
         Layer &prev_layer = layers[layer_num-1];
-        for (unsigned n=0;n<layer.size();++n) {
+        for (unsigned n=0;n<layer.size()-1;++n) {
             //cout << n << endl;
             layer[n].update_input_weights(prev_layer);
         }
@@ -125,7 +124,8 @@ vector<unsigned> Net::get_topology() {
 }
 
 void Net::save_to_file(const char * filename) {
-    fstream ofs(filename, std::ofstream::out);
+    cout << top.size() << endl;
+    ofstream ofs(filename);
     ofs << top.size() << endl;     
     for (unsigned i=0;i<top.size();i++) {
         ofs << top[i] << " ";

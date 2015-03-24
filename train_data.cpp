@@ -50,12 +50,11 @@ int main(int argc, char ** argv) {
         topology.push_back(16*16);
         topology.push_back(16*16);
         topology.push_back(16*16);
-        topology.push_back(10);
-        my_net = new Net(topology);   
+        topology.push_back(10); 
+        my_net = new Net(topology);
     } else {
         my_net = new Net("test.txt");
     }
- //   cout << "files: " << files.size() << endl;
 
   /*  for (unsigned i=0;i<files.size();i++) {
         string cf = dir+files[i];
@@ -79,7 +78,9 @@ int main(int argc, char ** argv) {
     }
     vector<double> simplified = simplify(image);
     my_net->feed_forward(simplified);
+    cout << "fed forward" << endl;
     my_net->backprop(target_v);
+    cout << "backpropagated" << endl;
     my_net->save_to_file("test.txt");
     delete my_net;
 
