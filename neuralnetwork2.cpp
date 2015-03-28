@@ -13,25 +13,23 @@ Neuron::Neuron (unsigned num_outputs, unsigned my_index) {
 }
 
 void Neuron::update_input_weights(Layer &prev_layer) {
-//    cout << "a" << endl;
     for (Layer::iterator it = prev_layer.begin();it!=prev_layer.end();++it) {
         Neuron &neuron = *it;
-        //double old_weight = neuron.output_weights[index].weight;
         double old_delta_weight = neuron.output_weights.at(index).delta_weight;
 
         double new_delta_weight = eta * neuron.get_output_value() * gradient + alpha * old_delta_weight;
         neuron.output_weights[index].delta_weight = new_delta_weight;
         neuron.output_weights[index].weight += new_delta_weight;
-//        cout << "weight updated from " << old_weight << " to " << neuron.output_weights[index].weight << endl;
     } 
 }
 
 double Neuron::transfer_function(double x) {
-    return tanh(x);
+    return (1.0/(1.0+exp(-x)));
 }
 
 double Neuron::transfer_function_derivative(double x) {
-    return 1.0 - x * x;
+    double f = transfer_function(x); 
+    return f * (1 - f);
 }
 
 void Neuron::feed_forward(const Layer &prev_layer) {
@@ -46,8 +44,10 @@ void Neuron::feed_forward(const Layer &prev_layer) {
 double Neuron::sum_DOW(const Layer &next_layer) const {
     double sum = 0.0;
     for (unsigned n=0; n<next_layer.size() - 1; ++n ) { 
+        //cout << output_weights[n].weight << " " << next_layer[n].gradient << endl;
         sum += output_weights[n].weight * next_layer[n].gradient;
     }
+    return sum;
 }
 
 void Neuron::calc_hidden_gradients(const Layer &next_layer) {
@@ -105,6 +105,7 @@ void Net::backprop(const vector<double> &target_vals) {
         Layer &next_layer = layers[layer_num+1];
 
         for (unsigned n=0;n<hidden_layer.size();++n) {
+            //cout << "LAYER " << layer_num << ", NEURON " << n << ":"<<endl;
             hidden_layer[n].calc_hidden_gradients(next_layer);
         }
     }

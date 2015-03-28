@@ -33,8 +33,8 @@ int getdir (string dir, vector<string> &files)
 int main(int argc, char ** argv) {
     srand(time(0));
     vector<string> files;
-    //string dir(argv[1]); 
-//    getdir(dir,files);
+    string dir(argv[1]); 
+    getdir(dir,files);
     int target = atoi(argv[2]);
     vector<double> target_v(10,0);
     target_v[target] = 1;
@@ -50,13 +50,14 @@ int main(int argc, char ** argv) {
         topology.push_back(16*16);
         topology.push_back(16*16);
         topology.push_back(16*16);
+        topology.push_back(16*16);
         topology.push_back(10); 
         my_net = new Net(topology);
     } else {
         my_net = new Net("test.txt");
     }
 
-  /*  for (unsigned i=0;i<files.size();i++) {
+    for (unsigned i=0;i<files.size();i++) {
         string cf = dir+files[i];
         cv::Mat image;
         cout << cf << endl;
@@ -69,8 +70,9 @@ int main(int argc, char ** argv) {
         vector<double> simplified = simplify(image);
         my_net->feed_forward(simplified);
         my_net->backprop(target_v);
-    }*/
+    }
 
+    /*
     cv::Mat image = cv::imread(argv[1],CV_LOAD_IMAGE_COLOR);
     if (image.rows < 16 || image.cols < 16) {
         cout << "IMAGE TOO SMALL" << endl;
@@ -80,7 +82,7 @@ int main(int argc, char ** argv) {
     my_net->feed_forward(simplified);
     cout << "fed forward" << endl;
     my_net->backprop(target_v);
-    cout << "backpropagated" << endl;
+    cout << "backpropagated" << endl;*/
     my_net->save_to_file("test.txt");
     delete my_net;
 
