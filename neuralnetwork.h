@@ -36,7 +36,7 @@ class Neuron {
         static double alpha;
         static double transfer_function(double x);
         static double transfer_function_derivative(double x);
-        static double random_weight() {return (rand() / double (RAND_MAX))*2-1;}
+        static double random_weight() {return (rand() / double (RAND_MAX))*5-2.5;}
         double sum_DOW(const Layer &next_layer) const;
         double output_val;
         unsigned index;

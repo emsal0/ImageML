@@ -17,7 +17,7 @@ void Neuron::update_input_weights(Layer &prev_layer) {
         Neuron &neuron = *it;
         double old_delta_weight = neuron.output_weights.at(index).delta_weight;
 
-        double new_delta_weight = eta * neuron.get_output_value() * gradient + alpha * old_delta_weight;
+        double new_delta_weight = eta * neuron.get_output_value() * gradient;// + alpha * old_delta_weight;
         neuron.output_weights[index].delta_weight = new_delta_weight;
         neuron.output_weights[index].weight += new_delta_weight;
     } 

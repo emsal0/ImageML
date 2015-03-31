@@ -51,10 +51,12 @@ int main(int argc, char ** argv) {
         topology.push_back(16*16);
         topology.push_back(16*16);
         topology.push_back(16*16);
+        topology.push_back(16*16);
+        topology.push_back(16*16);
         topology.push_back(10); 
         my_net = new Net(topology);
     } else {
-        my_net = new Net("test.txt");
+        my_net = new Net("test2.txt");
     }
 
     for (unsigned i=0;i<files.size();i++) {
@@ -83,7 +85,7 @@ int main(int argc, char ** argv) {
     cout << "fed forward" << endl;
     my_net->backprop(target_v);
     cout << "backpropagated" << endl;*/
-    my_net->save_to_file("test.txt");
+    my_net->save_to_file("test2.txt");
     delete my_net;
 
     return(0);
