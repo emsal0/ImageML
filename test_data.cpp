@@ -31,7 +31,6 @@ int main(int argc, char ** argv) {
         }
     }
     cout << endl;
-    //vector<double> simplified = simplify(image);
     my_net.feed_forward(simplified);
     vector<double> results;
     my_net.get_results(results);
@@ -39,7 +38,7 @@ int main(int argc, char ** argv) {
     for (unsigned i=0;i<results.size();i++) {
         cout << results[i] << " ";
     }
-    cout << " }" << endl;
+    cout << "}" << endl;
     return(0);
 }
 

@@ -51,8 +51,10 @@ int main(int argc, char ** argv) {
         topology.push_back(16*16);
         topology.push_back(16*16);
         topology.push_back(16*16);
-        topology.push_back(16*16);
-        topology.push_back(16*16);
+        topology.push_back(8*8);
+        topology.push_back(8*8);
+        topology.push_back(4*4);
+        topology.push_back(4*4);
         topology.push_back(10); 
         my_net = new Net(topology);
     } else {

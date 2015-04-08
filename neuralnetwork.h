@@ -25,6 +25,7 @@ class Neuron {
         Neuron(unsigned num_outputs,unsigned my_index);
         void set_output_value(double val);
         double get_output_value() const { return output_val; }
+        void set_weights(unsigned num_neurons);
         void feed_forward(const Layer &prev_layer);
         void calc_output_gradients(double target_val);
         void calc_hidden_gradients(const Layer &next_layer);
@@ -36,7 +37,7 @@ class Neuron {
         static double alpha;
         static double transfer_function(double x);
         static double transfer_function_derivative(double x);
-        static double random_weight() {return (rand() / double (RAND_MAX))*5-2.5;}
+        static double random_weight() {return (rand() / (double) RAND_MAX);}
         double sum_DOW(const Layer &next_layer) const;
         double output_val;
         unsigned index;

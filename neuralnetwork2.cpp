@@ -6,38 +6,49 @@ double Neuron::alpha = 0.5;
 Neuron::Neuron (unsigned num_outputs, unsigned my_index) {
     for (unsigned c=0;c<num_outputs;++c) {
         output_weights.push_back(Connection());
-        output_weights.back().weight = random_weight();
         //output_weights.back().delta_weight = 0.0;
     }
     index = my_index;
 }
+
+void Neuron::set_weights(unsigned num_neurons) {
+    double x = 1.0 / sqrt(num_neurons);
+    for (unsigned c=0;c<output_weights.size();++c) {
+        double r = (rand() / (double) RAND_MAX)*2*x - x;
+        output_weights[c].weight = r;
+    }
+    
+} 
 
 void Neuron::update_input_weights(Layer &prev_layer) {
     for (Layer::iterator it = prev_layer.begin();it!=prev_layer.end();++it) {
         Neuron &neuron = *it;
         double old_delta_weight = neuron.output_weights.at(index).delta_weight;
 
-        double new_delta_weight = eta * neuron.get_output_value() * gradient;// + alpha * old_delta_weight;
+        double new_delta_weight = eta * neuron.get_output_value() * gradient + alpha * old_delta_weight;
         neuron.output_weights[index].delta_weight = new_delta_weight;
         neuron.output_weights[index].weight += new_delta_weight;
     } 
 }
 
 double Neuron::transfer_function(double x) {
-    return (1.0/(1.0+exp(-x)));
+    return 1.0 / (1.0 + exp(-x));
 }
 
 double Neuron::transfer_function_derivative(double x) {
-    double f = transfer_function(x); 
-    return f * (1 - f);
+    double f = Neuron::transfer_function(x);
+    return f * (1-f);
 }
 
 void Neuron::feed_forward(const Layer &prev_layer) {
+    cout << "Neuron " << index << endl;
     double sum = 0.0;
-
     for (unsigned n=0; n<prev_layer.size(); ++n) {
+        cout << prev_layer[n].get_output_value() << " * " << prev_layer[n].output_weights[index].weight << " = " << prev_layer[n].get_output_value() * prev_layer[n].output_weights[index].weight << endl;
         sum += prev_layer[n].get_output_value() * prev_layer[n].output_weights[index].weight;
     }
+    sum = sum > 0 ? sum : 0;
+    cout << "sum: " << sum << ", new output: " << Neuron::transfer_function(sum) << endl;
     output_val = Neuron::transfer_function(sum);
 }
 
@@ -66,6 +77,20 @@ void Neuron::set_output_value(double val) {
 
 
 void Net::get_results(vector<double> &result_vals) const {
+    /*for (unsigned i=0;i<layers.size();i++) {
+        cout << "Layer " << i << ": {";
+        for (unsigned n=0;n<layers[i].size();n++) {
+            cout << layers[i][n].get_output_value() << " ";
+        }
+        cout << "}" << endl;
+    }*/
+    cout << "{ ";
+    for (unsigned i=0;i<layers[1].size();i++) {
+        cout << layers[1][i].get_output_value() << " ";
+    }
+    cout << "}" << endl;
+
+
     result_vals.clear();
     for (unsigned n=0;n<layers.back().size() -1;++n) {
         result_vals.push_back(layers.back()[n].get_output_value());
@@ -73,12 +98,23 @@ void Net::get_results(vector<double> &result_vals) const {
 }
 
 void Net::feed_forward(const vector<double> &input_vals) {
+
+
     assert(input_vals.size() == layers[0].size()-1);
     for (unsigned i=0; i<input_vals.size();++i) {
         layers[0][i].set_output_value(input_vals[i]);
     }
+
+    /*cout << "{ ";
+    for (unsigned i=0;i<layers[0].size();++i) {
+        cout << layers[0][i].get_output_value() << " ";
+    }
+    cout << "}" << endl;*/
+
+
     for (unsigned layer_num = 1; layer_num < layers.size(); ++layer_num) {
         Layer &prev_layer = layers[layer_num - 1];
+        cout << "Layer " << layer_num << ":" << endl;
         for (unsigned n = 0; n < layers[layer_num].size() - 1; ++n) {
             layers[layer_num][n].feed_forward(prev_layer);
         }
@@ -110,11 +146,11 @@ void Net::backprop(const vector<double> &target_vals) {
         }
     }
 
-    for (unsigned layer_num = layers.size() - 1; layer_num > 0; layer_num--) {
+    for (unsigned layer_num = layers.size() - 1; layer_num >= 1; layer_num--) {
+        cout << "updating layer "<<layer_num << endl;
         Layer &layer = layers[layer_num];
         Layer &prev_layer = layers[layer_num-1];
         for (unsigned n=0;n<layer.size()-1;++n) {
-            //cout << n << endl;
             layer[n].update_input_weights(prev_layer);
         }
     }
@@ -143,7 +179,6 @@ void Net::save_to_file(const char * filename) {
             ofs << last_weight.weight << " " << last_weight.delta_weight << endl;
         }          
     } 
-
     ofs.close();
 }
 
@@ -157,6 +192,7 @@ Net::Net(const vector<unsigned> &topology) {
 
         for (unsigned neuron_num = 0; neuron_num <= topology[i]; ++neuron_num) {
             layers.back().push_back(Neuron(num_outputs,neuron_num));
+            layers.back().back().set_weights(topology[i]);
 
         }
         layers.back().back().set_output_value(1.0);
