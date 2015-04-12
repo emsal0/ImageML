@@ -41,14 +41,12 @@ double Neuron::transfer_function_derivative(double x) {
 }
 
 void Neuron::feed_forward(const Layer &prev_layer) {
-    cout << "Neuron " << index << endl;
+    //cout << "Neuron " << index << endl;
     double sum = 0.0;
     for (unsigned n=0; n<prev_layer.size(); ++n) {
-        cout << prev_layer[n].get_output_value() << " * " << prev_layer[n].output_weights[index].weight << " = " << prev_layer[n].get_output_value() * prev_layer[n].output_weights[index].weight << endl;
+        //cout << prev_layer[n].get_output_value() << " * " << prev_layer[n].output_weights[index].weight << " = " << prev_layer[n].get_output_value() * prev_layer[n].output_weights[index].weight << endl;
         sum += prev_layer[n].get_output_value() * prev_layer[n].output_weights[index].weight;
     }
-    sum = sum > 0 ? sum : 0;
-    cout << "sum: " << sum << ", new output: " << Neuron::transfer_function(sum) << endl;
     output_val = Neuron::transfer_function(sum);
 }
 
