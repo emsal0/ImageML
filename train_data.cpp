@@ -1,5 +1,7 @@
 #include <iostream>
+#include <utility>
 #include <vector>
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
@@ -30,36 +32,53 @@ int getdir (string dir, vector<string> &files)
     return 0;
 }
 
+int myrandom (int i) { return std::rand()%i;}
+
 int main(int argc, char ** argv) {
     srand(time(0));
-    vector<string> files;
-    string dir(argv[1]); 
+    std::vector<string> files;
+    string dir(argv[1]);
     getdir(dir,files);
-    int target = atoi(argv[2]);
-    vector<double> target_v(10,0);
-    target_v[target] = 1;
- 
-    for (unsigned i=0;i<target_v.size();i++) {
-        cout << target_v[i] << " ";
+    std::vector< std::pair<std::string,unsigned> > mlmap;
+
+    for (unsigned i=0;i<files.size();i++) {
+        string curr = files[i];
+        int num;
+        if (curr.size() > 3) {
+            num = atoi(curr.substr(curr.size()-3).c_str()) - 1;
+        }
+        if (num < 10) {
+            string path = dir + files[i];
+            vector<string> inner_files;
+            getdir(path,inner_files);
+            for (unsigned j=0;j<inner_files.size();j++) {
+                if (inner_files[j].size() > 2) {
+                    string curr_inner = path + "/" + inner_files[j];
+                    std::pair<std::string,unsigned> f;
+                    f.first = curr_inner;
+                    f.second = num;
+                    mlmap.push_back(f);
+                }
+            }
+        }
     }
-    cout << endl;
 
     Net * my_net;
-    if (!ifstream("test.txt")) {
+    if (!ifstream("test2.txt")) {
         vector<unsigned> topology;
         topology.push_back(16*16);
-        topology.push_back(10); 
+        topology.push_back(16);
+        topology.push_back(10);
         my_net = new Net(topology);
     } else {
         my_net = new Net("test2.txt");
     }
-
-    for (unsigned i=0;i<files.size();i++) {
-        string cf = dir+files[i];
+    std::random_shuffle(mlmap.begin(),mlmap.end(),myrandom);
+    for (unsigned i=0; i<mlmap.size();i++) {
         cv::Mat image;
-        cout << cf << endl;
-        image = cv::imread(cf, CV_LOAD_IMAGE_COLOR);    
-        cout << image.rows << " " << image.cols << endl;
+        vector<double> target_v(10,0);
+        target_v[mlmap[i].second] = 1;
+        image = cv::imread(mlmap[i].first,CV_LOAD_IMAGE_COLOR);
         if (image.rows < 16 || image.cols < 16) {
             cout << "too small!" << endl;
             continue;
@@ -68,19 +87,8 @@ int main(int argc, char ** argv) {
         my_net->feed_forward(simplified);
         my_net->backprop(target_v);
     }
-
-    /*
-    cv::Mat image = cv::imread(argv[1],CV_LOAD_IMAGE_COLOR);
-    if (image.rows < 16 || image.cols < 16) {
-        cout << "IMAGE TOO SMALL" << endl;
-        return -1;
-    }
-    vector<double> simplified = simplify(image);
-    my_net->feed_forward(simplified);
-    cout << "fed forward" << endl;
-    my_net->backprop(target_v);
-    cout << "backpropagated" << endl;*/
     my_net->save_to_file("test2.txt");
+
     delete my_net;
 
     return(0);
