@@ -7,6 +7,7 @@ Neuron::Neuron (unsigned num_outputs, unsigned my_index) {
     for (unsigned c=0;c<num_outputs;++c) {
         output_weights.push_back(Connection());
         //output_weights.back().delta_weight = 0.0;
+        output_weights.back().weight = random_weight();
     }
     index = my_index;
 }
@@ -190,7 +191,7 @@ Net::Net(const vector<unsigned> &topology) {
 
         for (unsigned neuron_num = 0; neuron_num <= topology[i]; ++neuron_num) {
             layers.back().push_back(Neuron(num_outputs,neuron_num));
-            layers.back().back().set_weights(topology[i]);
+            //layers.back().back().set_weights(topology[i]);
 
         }
         layers.back().back().set_output_value(1.0);

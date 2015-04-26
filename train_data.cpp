@@ -67,7 +67,6 @@ int main(int argc, char ** argv) {
     if (!ifstream("test2.txt")) {
         vector<unsigned> topology;
         topology.push_back(16*16);
-        topology.push_back(16);
         topology.push_back(10);
         my_net = new Net(topology);
     } else {
