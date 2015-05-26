@@ -37,7 +37,7 @@ int myrandom (int i) { return std::rand()%i;}
 int main(int argc, char ** argv) {
     srand(time(0));
     std::vector<string> files;
-    string dir(argv[1]);
+    string dir("Eng-Characters/Img/GoodImg/Bmp/");
     getdir(dir,files);
     std::vector< std::pair<std::string,unsigned> > mlmap;
 
